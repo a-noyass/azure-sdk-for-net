@@ -49,13 +49,13 @@ namespace Azure.AI.DocumentTranslation.Tests.Samples
 
             TimeSpan pollingInterval = new TimeSpan(1000);
 
-            Response<DocumentStatusDetail> docStatus = operation.GetDocumentStatus(firstDocument.Id);
+            Response<DocumentStatusDetail> docStatus = await operation.GetDocumentStatusAsync(firstDocument.Id);
 
             while (docStatus.Value.Status != DocumentTranslationStatus.Failed
                 && docStatus.Value.Status != DocumentTranslationStatus.Succeeded)
             {
                 await Task.Delay(pollingInterval);
-                docStatus = operation.GetDocumentStatus(firstDocument.Id);
+                docStatus = await operation.GetDocumentStatusAsync(firstDocument.Id);
             }
 
             Console.WriteLine($"Document {firstDocument.Url} completed with status ${firstDocument.Status}");

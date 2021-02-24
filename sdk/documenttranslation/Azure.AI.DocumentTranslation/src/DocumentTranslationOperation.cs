@@ -293,14 +293,14 @@ namespace Azure.AI.DocumentTranslation
         /// <param name="documentId"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public virtual async Task<Response<DocumentStatusDetail>> GetDocumentStatusAsync(Guid documentId, CancellationToken cancellationToken = default)
+        public virtual async Task<Response<DocumentStatusDetail>> GetDocumentStatusAsync(string documentId, CancellationToken cancellationToken = default)
         {
             using DiagnosticScope scope = _diagnostics.CreateScope($"{nameof(DocumentTranslationOperation)}.{nameof(GetDocumentStatusAsync)}");
             scope.Start();
 
             try
             {
-                return await _serviceClient.GetDocumentStatusAsync(new Guid(Id), documentId, cancellationToken).ConfigureAwait(false);
+                return await _serviceClient.GetDocumentStatusAsync(new Guid(Id), new Guid(documentId), cancellationToken).ConfigureAwait(false);
             }
             catch (Exception e)
             {
