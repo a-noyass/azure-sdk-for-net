@@ -107,7 +107,7 @@ namespace Azure.AI.DocumentTranslation
         /// <param name="inputs"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public virtual DocumentTranslationOperation StartBatchTranslation(List<BatchDocumentInput> inputs, CancellationToken cancellationToken = default)
+        public virtual DocumentTranslationOperation StartBatchTranslation(List<DocumentTranslationInput> inputs, CancellationToken cancellationToken = default)
         {
             var request = new BatchSubmissionRequest(inputs);
             using DiagnosticScope scope = _clientDiagnostics.CreateScope($"{nameof(DocumentTranslationClient)}.{nameof(StartBatchTranslation)}");
@@ -131,7 +131,7 @@ namespace Azure.AI.DocumentTranslation
         /// <param name="inputs"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public virtual async Task<DocumentTranslationOperation> StartBatchTranslationAsync(List<BatchDocumentInput> inputs, CancellationToken cancellationToken = default)
+        public virtual async Task<DocumentTranslationOperation> StartBatchTranslationAsync(List<DocumentTranslationInput> inputs, CancellationToken cancellationToken = default)
         {
             var request = new BatchSubmissionRequest(inputs);
             using DiagnosticScope scope = _clientDiagnostics.CreateScope($"{nameof(DocumentTranslationClient)}.{nameof(StartBatchTranslationAsync)}");
@@ -161,9 +161,9 @@ namespace Azure.AI.DocumentTranslation
         public virtual DocumentTranslationOperation StartBatchTranslation(Uri sourceUrl, string sourceLanguage, Uri targetUrl, string targetLanguage, CancellationToken cancellationToken = default)
         {
             // TODO: remove sourceLanguage when service supports automatic language detection
-            var request = new BatchSubmissionRequest(new List<BatchDocumentInput>
+            var request = new BatchSubmissionRequest(new List<DocumentTranslationInput>
                 {
-                    new BatchDocumentInput(new SourceInput(sourceUrl.AbsoluteUri) { Language = sourceLanguage }, new List<TargetInput>
+                    new DocumentTranslationInput(new SourceInput(sourceUrl.AbsoluteUri) { Language = sourceLanguage }, new List<TargetInput>
                         {
                             new TargetInput(targetUrl.AbsoluteUri, targetLanguage)
                         })
@@ -196,9 +196,9 @@ namespace Azure.AI.DocumentTranslation
         public virtual async Task<DocumentTranslationOperation> StartBatchTranslationAsync(Uri sourceUrl, string sourceLanguage, Uri targetUrl, string targetLanguage, CancellationToken cancellationToken = default)
         {
             // TODO: remove sourceLanguage when service supports automatic language detection
-            var request = new BatchSubmissionRequest(new List<BatchDocumentInput>
+            var request = new BatchSubmissionRequest(new List<DocumentTranslationInput>
                 {
-                    new BatchDocumentInput(new SourceInput(sourceUrl.AbsoluteUri) { Language = sourceLanguage }, new List<TargetInput>
+                    new DocumentTranslationInput(new SourceInput(sourceUrl.AbsoluteUri) { Language = sourceLanguage }, new List<TargetInput>
                         {
                             new TargetInput(targetUrl.AbsoluteUri, targetLanguage)
                         })
@@ -475,12 +475,14 @@ namespace Azure.AI.DocumentTranslation
             return PageableHelpers.CreateAsyncEnumerable(FirstPageFunc, NextPageFunc);
         }
 
+        #region supported formats
+
         /// <summary>
         /// a.
         /// </summary>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public virtual Response<IReadOnlyList<FileFormat>> GetSupportedGlossaryFormats(CancellationToken cancellationToken = default)
+        internal virtual Response<IReadOnlyList<FileFormat>> GetSupportedGlossaryFormats(CancellationToken cancellationToken = default)
         {
             using DiagnosticScope scope = _clientDiagnostics.CreateScope($"{nameof(DocumentTranslationClient)}.{nameof(GetSupportedGlossaryFormats)}");
             scope.Start();
@@ -502,7 +504,7 @@ namespace Azure.AI.DocumentTranslation
         /// </summary>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public virtual async Task<Response<IReadOnlyList<FileFormat>>> GetSupportedGlossaryFormatsAsync(CancellationToken cancellationToken = default)
+        internal virtual async Task<Response<IReadOnlyList<FileFormat>>> GetSupportedGlossaryFormatsAsync(CancellationToken cancellationToken = default)
         {
             using DiagnosticScope scope = _clientDiagnostics.CreateScope($"{nameof(DocumentTranslationClient)}.{nameof(GetSupportedGlossaryFormatsAsync)}");
             scope.Start();
@@ -586,6 +588,8 @@ namespace Azure.AI.DocumentTranslation
                 throw;
             }
         }
+
+        #endregion
 
         #region nobody wants to see these
         /// <summary>

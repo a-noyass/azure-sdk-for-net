@@ -33,7 +33,7 @@ namespace Azure.AI.DocumentTranslation
         /// <summary>
         /// List of possible statuses for job or document.
         /// </summary>
-        public DocumentTranslationStatus Status => _status;
+        public TranslationStatus Status => _status;
 
         /// <summary>
         /// Total number of documents in the operation.
@@ -73,7 +73,7 @@ namespace Azure.AI.DocumentTranslation
         private int _documentsCancelled;
         private DateTimeOffset _createdOn;
         private DateTimeOffset _lastModified;
-        private DocumentTranslationStatus _status;
+        private TranslationStatus _status;
 
         /// <summary>
         /// Gets an ID representing the operation that can be used to poll for the status
@@ -241,14 +241,14 @@ namespace Azure.AI.DocumentTranslation
                     _documentsCancelled = update.Value.DocumentsCancelled;
 
                     // TODO: Handle Failed and ValidationFailed correctly
-                    if (update.Value.Status == DocumentTranslationStatus.Succeeded)
+                    if (update.Value.Status == TranslationStatus.Succeeded)
                     {
                         // we need to first assign a vaue and then mark the operation as completed to avoid race conditions
                         _value = update.Value;
 
                         _hasCompleted = true;
                     }
-                    else if (update.Value.Status == DocumentTranslationStatus.Failed)
+                    else if (update.Value.Status == TranslationStatus.Failed)
                     {
                         _requestFailedException = _diagnostics.CreateRequestFailedException(_response);
                         _hasCompleted = true;

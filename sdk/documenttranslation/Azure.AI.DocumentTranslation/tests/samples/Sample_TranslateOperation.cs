@@ -23,9 +23,9 @@ namespace Azure.AI.DocumentTranslation.Tests.Samples
 
             var client = new DocumentTranslationClient(new Uri(endpoint), new AzureKeyCredential(apiKey));
 
-            var inputs = new List<BatchDocumentInput>()
+            var inputs = new List<DocumentTranslationInput>()
                 {
-                    new BatchDocumentInput(new SourceInput(sourceUrl)
+                    new DocumentTranslationInput(new SourceInput(sourceUrl)
                         {
                             Language = "en"
                         },
@@ -64,7 +64,7 @@ namespace Azure.AI.DocumentTranslation.Tests.Samples
             {
                 Console.WriteLine($"Document with Id: {document.Id}");
                 Console.WriteLine($"  Status:{document.Status}");
-                if (document.Status == DocumentTranslationStatus.Succeeded)
+                if (document.Status == TranslationStatus.Succeeded)
                 {
                     Console.WriteLine($"  Location: {document.Url}");
                     Console.WriteLine($"  Translated to language: {document.TranslateTo}.");

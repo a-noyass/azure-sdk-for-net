@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Azure.AI.DocumentTranslation.Models;
 using Azure.Core.TestFramework;
@@ -21,18 +20,37 @@ namespace Azure.AI.DocumentTranslation.Tests.Samples
             var client = new DocumentTranslationClient(new Uri(endpoint), new AzureKeyCredential(apiKey));
 
             AsyncPageable<OperationStatusDetail> operations = client.GetStatusesOfOperationsAsync();
-            IAsyncEnumerator<OperationStatusDetail> operationsEnumerator = operations.GetAsyncEnumerator();
-            await operationsEnumerator.MoveNextAsync();
 
-            OperationStatusDetail latestOperation = operationsEnumerator.Current;
-            var operation = new DocumentTranslationOperation(latestOperation.Id, client);
+            int operationsCount = 0;
+            int totalDocs = 0;
+            int docsCancelled = 0;
+            int docsSucceeded = 0;
+            int maxDocs = 0;
+            string largestOperationId = "";
 
-            AsyncPageable<DocumentStatusDetail> documents = client.GetStatusesOfDocumentsAsync(operation.Id);
-            IAsyncEnumerator<DocumentStatusDetail> docsEnumerator = documents.GetAsyncEnumerator();
-
-            while (await docsEnumerator.MoveNextAsync())
+            await foreach (OperationStatusDetail operation in operations)
             {
-                Console.WriteLine($"Document {docsEnumerator.Current.Url} has status {docsEnumerator.Current.Status}");
+                operationsCount++;
+                totalDocs += operation.TotalDocuments;
+                docsCancelled += operation.DocumentsCancelled;
+                docsSucceeded += operation.DocumentsSucceeded;
+                if (totalDocs > maxDocs)
+                {
+                    maxDocs = totalDocs;
+                    largestOperationId = operation.Id;
+                }
+            }
+
+            Console.WriteLine($"# of operations: {operationsCount}\nTotal Documents: {totalDocs}\n"
+                              + $"DocumentsSucceeded: {docsSucceeded}\n"
+                              + $"Cancelled Documents: {docsCancelled}");
+
+            Console.WriteLine($"Largest operation is {largestOperationId} and has the documents:");
+            AsyncPageable<DocumentStatusDetail> docs = client.GetStatusesOfDocumentsAsync(largestOperationId);
+
+            await foreach (DocumentStatusDetail docStatus in docs)
+            {
+                Console.WriteLine($"Document {docStatus.Url} has status {docStatus.Status}");
             }
         }
     }

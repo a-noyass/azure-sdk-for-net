@@ -23,9 +23,9 @@ namespace Azure.AI.DocumentTranslation.Tests.Samples
 
             var client = new DocumentTranslationClient(new Uri(endpoint), new AzureKeyCredential(apiKey));
 
-            var inputs = new List<BatchDocumentInput>()
+            var inputs = new List<DocumentTranslationInput>()
                 {
-                    new BatchDocumentInput(new SourceInput(sourceUrl)
+                    new DocumentTranslationInput(new SourceInput(sourceUrl)
                         {
                             Language = "en"
                         },
@@ -40,25 +40,37 @@ namespace Azure.AI.DocumentTranslation.Tests.Samples
 
             DocumentTranslationOperation operation = client.StartBatchTranslation(inputs);
 
-            // get first document
-            Pageable<DocumentStatusDetail> documents = client.GetStatusesOfDocuments(operation.Id);
-            IEnumerator<DocumentStatusDetail> docsEnumerator = documents.GetEnumerator();
-            docsEnumerator.MoveNext();
+            // get not finished documents
+            List<string> documentIds = new List<string>();
+            Pageable<DocumentStatusDetail> documents = client.GetStatusesOfDocuments(operation.Value.Id);
 
-            DocumentStatusDetail doc = docsEnumerator.Current;
+            foreach (DocumentStatusDetail docStatus in documents)
+            {
+                if (docStatus.Status == TranslationStatus.NotStarted || docStatus.Status == TranslationStatus.Running)
+                {
+                    documentIds.Add(docStatus.Id);
+                }
+                else
+                {
+                    Console.WriteLine($"Document {docStatus.Url} completed with status ${docStatus.Status}");
+                }
+            }
 
             TimeSpan pollingInterval = new TimeSpan(1000);
 
-            Response<DocumentStatusDetail> docStatus = client.GetDocumentStatus(operation.Id, doc.Id);
-
-            while (docStatus.Value.Status != DocumentTranslationStatus.Failed
-                && docStatus.Value.Status != DocumentTranslationStatus.Succeeded)
+            while (documentIds.Count > 0)
             {
                 Thread.Sleep(pollingInterval);
-                docStatus = client.GetDocumentStatus(operation.Id, doc.Id);
+                for (int i = documentIds.Count - 1; i >= 0; i--)
+                {
+                    Response<DocumentStatusDetail> status = client.GetDocumentStatus(operation.Value.Id, documentIds[i]);
+                    if (status.Value.Status != TranslationStatus.NotStarted && status.Value.Status != TranslationStatus.Running)
+                    {
+                        Console.WriteLine($"Document {status.Value.Url} completed with status ${status.Value.Status}");
+                        documentIds.RemoveAt(i);
+                    }
+                }
             }
-
-            Console.WriteLine($"Document {doc.Url} completed with status ${doc.Status}");
         }
     }
 }
