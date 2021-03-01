@@ -24,8 +24,6 @@ namespace Azure.AI.DocumentTranslation.Tests.Samples
 
             DocumentTranslationOperation operation = await client.StartBatchTranslationAsync(new Uri(sourceUrl), "es", new Uri(targetUrl), "en");
 
-            await operation.WaitForCompletionAsync();
-
             Response<OperationStatusDetail> response = await operation.WaitForCompletionAsync();
 
             // response has the same fields in the operation class
