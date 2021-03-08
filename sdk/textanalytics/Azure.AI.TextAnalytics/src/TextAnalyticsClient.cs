@@ -2362,6 +2362,18 @@ namespace Azure.AI.TextAnalytics
             {
                 tasks.EntityLinkingTasks = Transforms.ConvertFromEntityLinkingOptionsToTasks(actions.RecognizeLinkedEntitiesOptions);
             }
+            if (actions.RecognizeCustomEntitiesOptions != null)
+            {
+                tasks.CustomEntityRecognitionTasks = Transforms.ConvertFromCustomEntityOptionsToTasks(actions.RecognizeCustomEntitiesOptions);
+            }
+            if (actions.CustomClassificationOptions != null)
+            {
+                tasks.CustomClassificationTasks = Transforms.ConvertFromCustomClassificationOptionsToTasks(actions.CustomClassificationOptions);
+            }
+            if (actions.CustomMultiClassificationOptions != null)
+            {
+                tasks.CustomMultiClassificationTasks = Transforms.ConvertFromCustomMultiClassificationOptionsToTasks(actions.CustomMultiClassificationOptions);
+            }
 
             AnalyzeBatchInput analyzeDocumentInputs = new AnalyzeBatchInput(batchInput, tasks, actions.DisplayName);
 
@@ -2405,6 +2417,18 @@ namespace Azure.AI.TextAnalytics
             if (actions.RecognizeLinkedEntitiesOptions != null)
             {
                 tasks.EntityLinkingTasks = Transforms.ConvertFromEntityLinkingOptionsToTasks(actions.RecognizeLinkedEntitiesOptions);
+            }
+            if (actions.RecognizeCustomEntitiesOptions != null)
+            {
+                tasks.CustomEntityRecognitionTasks = Transforms.ConvertFromCustomEntityOptionsToTasks(actions.RecognizeCustomEntitiesOptions);
+            }
+            if (actions.CustomClassificationOptions != null)
+            {
+                tasks.CustomClassificationTasks = Transforms.ConvertFromCustomClassificationOptionsToTasks(actions.CustomClassificationOptions);
+            }
+            if (actions.CustomMultiClassificationOptions != null)
+            {
+                tasks.CustomMultiClassificationTasks = Transforms.ConvertFromCustomMultiClassificationOptionsToTasks(actions.CustomMultiClassificationOptions);
             }
 
             AnalyzeBatchInput analyzeDocumentInputs = new AnalyzeBatchInput(batchInput, tasks, actions.DisplayName);

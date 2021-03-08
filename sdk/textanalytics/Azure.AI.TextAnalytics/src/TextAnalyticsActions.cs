@@ -32,5 +32,20 @@ namespace Azure.AI.TextAnalytics
         /// Recognize Linked Entities actions configurations.
         /// </summary>
         public IReadOnlyCollection<RecognizeLinkedEntitiesOptions> RecognizeLinkedEntitiesOptions { get; set; }
+
+        /// <summary>
+        /// RecognizeCustomiEntityOptions
+        /// </summary>
+        public IReadOnlyCollection<RecognizeCustomEntitiesOptions> RecognizeCustomEntitiesOptions { get; set; }
+
+        /// <summary>
+        /// CustomClassificationOptions
+        /// </summary>
+        public IReadOnlyCollection<CustomClassificationOptions> CustomClassificationOptions { get; set; }
+
+        /// <summary>
+        /// CustomMultiClassificationOptions
+        /// </summary>
+        public IReadOnlyCollection<CustomMultiClassificationOptions> CustomMultiClassificationOptions { get; set; }
     }
 }

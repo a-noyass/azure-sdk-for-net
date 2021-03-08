@@ -7,6 +7,7 @@
 
 using System.Collections.Generic;
 using System.Text.Json;
+using Azure.AI.TextAnalytics.Models;
 using Azure.Core;
 
 namespace Azure.AI.TextAnalytics
@@ -24,6 +25,9 @@ namespace Azure.AI.TextAnalytics
             Optional<IReadOnlyList<EntityRecognitionPiiTasksItem>> entityRecognitionPiiTasks = default;
             Optional<IReadOnlyList<KeyPhraseExtractionTasksItem>> keyPhraseExtractionTasks = default;
             Optional<IReadOnlyList<EntityLinkingTasksItem>> entityLinkingTasks = default;
+            Optional<IReadOnlyList<CustomEntityRecognitionTasksItem>> customEntityRecognitionTasks = default;
+            Optional<IReadOnlyList<CustomClassificationTasksItem>> customClassificationTasks = default;
+            Optional<IReadOnlyList<CustomMultiClassificationTasksItem>> customMultiClassificationTasks = default;
             foreach (var property in element.EnumerateObject())
             {
                 if (property.NameEquals("details"))
@@ -116,8 +120,53 @@ namespace Azure.AI.TextAnalytics
                     entityLinkingTasks = array;
                     continue;
                 }
+                if (property.NameEquals("customEntityRecognitionTasks"))
+                {
+                    if (property.Value.ValueKind == JsonValueKind.Null)
+                    {
+                        property.ThrowNonNullablePropertyIsNull();
+                        continue;
+                    }
+                    List<CustomEntityRecognitionTasksItem> array = new List<CustomEntityRecognitionTasksItem>();
+                    foreach (var item in property.Value.EnumerateArray())
+                    {
+                        array.Add(CustomEntityRecognitionTasksItem.DeserializeCustomEntityRecognitionTasksItem(item));
+                    }
+                    customEntityRecognitionTasks = array;
+                    continue;
+                }
+                if (property.NameEquals("customClassificationTasks"))
+                {
+                    if (property.Value.ValueKind == JsonValueKind.Null)
+                    {
+                        property.ThrowNonNullablePropertyIsNull();
+                        continue;
+                    }
+                    List<CustomClassificationTasksItem> array = new List<CustomClassificationTasksItem>();
+                    foreach (var item in property.Value.EnumerateArray())
+                    {
+                        array.Add(CustomClassificationTasksItem.DeserializeCustomClassificationTasksItem(item));
+                    }
+                    customClassificationTasks = array;
+                    continue;
+                }
+                if (property.NameEquals("customMultiClassificationTasks"))
+                {
+                    if (property.Value.ValueKind == JsonValueKind.Null)
+                    {
+                        property.ThrowNonNullablePropertyIsNull();
+                        continue;
+                    }
+                    List<CustomMultiClassificationTasksItem> array = new List<CustomMultiClassificationTasksItem>();
+                    foreach (var item in property.Value.EnumerateArray())
+                    {
+                        array.Add(CustomMultiClassificationTasksItem.DeserializeCustomMultiClassificationTasksItem(item));
+                    }
+                    customMultiClassificationTasks = array;
+                    continue;
+                }
             }
-            return new AnalyzeTasks(details.Value, completed, failed, inProgress, total, Optional.ToList(entityRecognitionTasks), Optional.ToList(entityRecognitionPiiTasks), Optional.ToList(keyPhraseExtractionTasks), Optional.ToList(entityLinkingTasks));
+            return new AnalyzeTasks(details.Value, completed, failed, inProgress, total, Optional.ToList(entityRecognitionTasks), Optional.ToList(entityRecognitionPiiTasks), Optional.ToList(keyPhraseExtractionTasks), Optional.ToList(entityLinkingTasks), Optional.ToList(customEntityRecognitionTasks), Optional.ToList(customClassificationTasks), Optional.ToList(customMultiClassificationTasks));
         }
     }
 }

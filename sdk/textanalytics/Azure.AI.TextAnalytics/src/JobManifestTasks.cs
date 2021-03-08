@@ -32,5 +32,20 @@ namespace Azure.AI.TextAnalytics
         /// EntityLinkingTasks
         /// </summary>
         internal IList<EntityLinkingTask> EntityLinkingTasks { get; set; }
+
+        /// <summary>
+        /// CustomEntityRecognitionTasks
+        /// </summary>
+        internal IList<CustomEntitiesTask> CustomEntityRecognitionTasks { get; set; }
+
+        /// <summary>
+        /// CustomClassificationTasks
+        /// </summary>
+        internal IList<CustomClassificationTask> CustomClassificationTasks { get; set; }
+
+        /// <summary>
+        /// CustomMultiClassificationTasks
+        /// </summary>
+        internal IList<CustomMultiClassificationTask> CustomMultiClassificationTasks { get; set; }
     }
 }

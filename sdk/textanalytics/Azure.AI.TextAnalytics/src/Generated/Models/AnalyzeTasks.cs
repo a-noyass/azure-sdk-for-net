@@ -6,6 +6,7 @@
 #nullable disable
 
 using System.Collections.Generic;
+using Azure.AI.TextAnalytics.Models;
 using Azure.Core;
 
 namespace Azure.AI.TextAnalytics
@@ -28,6 +29,9 @@ namespace Azure.AI.TextAnalytics
             EntityRecognitionPiiTasks = new ChangeTrackingList<EntityRecognitionPiiTasksItem>();
             KeyPhraseExtractionTasks = new ChangeTrackingList<KeyPhraseExtractionTasksItem>();
             EntityLinkingTasks = new ChangeTrackingList<EntityLinkingTasksItem>();
+            CustomEntityRecognitionTasks = new ChangeTrackingList<CustomEntityRecognitionTasksItem>();
+            CustomClassificationTasks = new ChangeTrackingList<CustomClassificationTasksItem>();
+            CustomMultiClassificationTasks = new ChangeTrackingList<CustomMultiClassificationTasksItem>();
         }
 
         /// <summary> Initializes a new instance of AnalyzeTasks. </summary>
@@ -40,7 +44,10 @@ namespace Azure.AI.TextAnalytics
         /// <param name="entityRecognitionPiiTasks"> . </param>
         /// <param name="keyPhraseExtractionTasks"> . </param>
         /// <param name="entityLinkingTasks"> . </param>
-        internal AnalyzeTasks(TasksStateTasksDetailsInternal details, int completed, int failed, int inProgress, int total, IReadOnlyList<EntityRecognitionTasksItem> entityRecognitionTasks, IReadOnlyList<EntityRecognitionPiiTasksItem> entityRecognitionPiiTasks, IReadOnlyList<KeyPhraseExtractionTasksItem> keyPhraseExtractionTasks, IReadOnlyList<EntityLinkingTasksItem> entityLinkingTasks)
+        /// <param name="customEntityRecognitionTasks"> . </param>
+        /// <param name="customClassificationTasks"> . </param>
+        /// <param name="customMultiClassificationTasks"> . </param>
+        internal AnalyzeTasks(TasksStateTasksDetailsInternal details, int completed, int failed, int inProgress, int total, IReadOnlyList<EntityRecognitionTasksItem> entityRecognitionTasks, IReadOnlyList<EntityRecognitionPiiTasksItem> entityRecognitionPiiTasks, IReadOnlyList<KeyPhraseExtractionTasksItem> keyPhraseExtractionTasks, IReadOnlyList<EntityLinkingTasksItem> entityLinkingTasks, IReadOnlyList<CustomEntityRecognitionTasksItem> customEntityRecognitionTasks, IReadOnlyList<CustomClassificationTasksItem> customClassificationTasks, IReadOnlyList<CustomMultiClassificationTasksItem> customMultiClassificationTasks)
         {
             Details = details;
             Completed = completed;
@@ -51,7 +58,13 @@ namespace Azure.AI.TextAnalytics
             EntityRecognitionPiiTasks = entityRecognitionPiiTasks;
             KeyPhraseExtractionTasks = keyPhraseExtractionTasks;
             EntityLinkingTasks = entityLinkingTasks;
+            CustomEntityRecognitionTasks = customEntityRecognitionTasks;
+            CustomClassificationTasks = customClassificationTasks;
+            CustomMultiClassificationTasks = customMultiClassificationTasks;
         }
         public IReadOnlyList<EntityLinkingTasksItem> EntityLinkingTasks { get; }
+        public IReadOnlyList<CustomEntityRecognitionTasksItem> CustomEntityRecognitionTasks { get; }
+        public IReadOnlyList<CustomClassificationTasksItem> CustomClassificationTasks { get; }
+        public IReadOnlyList<CustomMultiClassificationTasksItem> CustomMultiClassificationTasks { get; }
     }
 }

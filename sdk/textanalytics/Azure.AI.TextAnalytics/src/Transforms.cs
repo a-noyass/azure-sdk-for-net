@@ -246,6 +246,97 @@ namespace Azure.AI.TextAnalytics
 
         #endregion
 
+        #region Recognize Custom Entities
+
+        internal static List<CustomEntity> ConvertToCustomEntityList(List<Entity> entities)
+            => entities.Select((entity) => new CustomEntity(entity)).ToList();
+
+        internal static CustomEntityCollection ConvertToCustomEntityCollection(DocumentCustomEntities documentEntities)
+        {
+            return new CustomEntityCollection(ConvertToCustomEntityList(documentEntities.Entities.ToList()), ConvertToWarnings(documentEntities.Warnings));
+        }
+
+        internal static RecognizeCustomEntitiesResultCollection ConvertToRecognizeCustomEntitiesResultCollection(CustomEntitiesResult results, IDictionary<string, int> idToIndexMap)
+        {
+            var recognizeEntities = new List<RecognizeCustomEntitiesResult>();
+
+            //Read errors
+            foreach (DocumentError error in results.Errors)
+            {
+                recognizeEntities.Add(new RecognizeCustomEntitiesResult(error.Id, ConvertToError(error.Error)));
+            }
+
+            //Read document custom entities
+            foreach (DocumentCustomEntities docEntities in results.Documents)
+            {
+                recognizeEntities.Add(new RecognizeCustomEntitiesResult(docEntities.Id, docEntities.Statistics ?? default, ConvertToCustomEntityCollection(docEntities)));
+            }
+
+            recognizeEntities = SortHeterogeneousCollection(recognizeEntities, idToIndexMap);
+
+            return new RecognizeCustomEntitiesResultCollection(recognizeEntities, results.Statistics);
+        }
+
+        #endregion
+
+        #region Custom Classification
+
+        internal static CustomClassificationResultCollection ConvertToCustomClassificationResultCollection(InternalCustomClassificationResult results, IDictionary<string, int> idToIndexMap)
+        {
+            var customClassifications = new List<CustomClassificationResult>();
+
+            //Read errors
+            foreach (DocumentError error in results.Errors)
+            {
+                customClassifications.Add(new CustomClassificationResult(error.Id, ConvertToError(error.Error)));
+            }
+
+            //Read document custom classification
+            foreach (DocumentCustomClassification docClassification in results.Documents)
+            {
+                customClassifications.Add(new CustomClassificationResult(docClassification.Id, docClassification.Statistics ?? default, new CustomClassification(docClassification.Classification)));
+            }
+
+            customClassifications = SortHeterogeneousCollection(customClassifications, idToIndexMap);
+
+            return new CustomClassificationResultCollection(customClassifications, results.Statistics);
+        }
+
+        #endregion
+
+        #region Custom Multi Classification
+
+        internal static List<CustomClassification> ConvertToCustomClassificationList(List<Classification> classifications)
+            => classifications.Select((classification) => new CustomClassification(classification)).ToList();
+
+        internal static CustomClassificationCollection ConvertToCustomClassificationCollection(DocumentCustomMultiClassification documentEntities)
+        {
+            return new CustomClassificationCollection(ConvertToCustomClassificationList(documentEntities.Classifications.ToList()), ConvertToWarnings(documentEntities.Warnings));
+        }
+
+        internal static CustomMultiClassificationResultCollection ConvertToCustomMultiClassificationResultCollection(InternalCustomMultiClassificationResult results, IDictionary<string, int> idToIndexMap)
+        {
+            var customMultiClassifications = new List<CustomMultiClassificationResult>();
+
+            //Read errors
+            foreach (DocumentError error in results.Errors)
+            {
+                customMultiClassifications.Add(new CustomMultiClassificationResult(error.Id, ConvertToError(error.Error)));
+            }
+
+            //Read document custom multi classifications
+            foreach (DocumentCustomMultiClassification docMultiClassification in results.Documents)
+            {
+                customMultiClassifications.Add(new CustomMultiClassificationResult(docMultiClassification.Id, docMultiClassification.Statistics ?? default, ConvertToCustomClassificationCollection(docMultiClassification)));
+            }
+
+            customMultiClassifications = SortHeterogeneousCollection(customMultiClassifications, idToIndexMap);
+
+            return new CustomMultiClassificationResultCollection(customMultiClassifications, results.Statistics);
+        }
+
+        #endregion
+
         #region Healthcare
 
         internal static List<HealthcareEntity> ConvertToHealthcareEntityCollection(IEnumerable<HealthcareEntityInternal> healthcareEntities)
@@ -393,6 +484,40 @@ namespace Azure.AI.TextAnalytics
             return list;
         }
 
+        internal static CustomEntitiesTask ConvertToCustomEntitiesTask(RecognizeCustomEntitiesOptions option)
+        {
+            return new CustomEntitiesTask()
+            {
+                Parameters = new CustomEntitiesTaskParameters()
+                {
+                    PublishId = option.PublishId,
+                    StringIndexType = option.StringIndexType
+                }
+            };
+        }
+
+        internal static CustomClassificationTask ConvertToCustomClassificationTask(CustomClassificationOptions option)
+        {
+            return new CustomClassificationTask()
+            {
+                Parameters = new CustomClassificationTaskParameters()
+                {
+                    PublishId = option.PublishId
+                }
+            };
+        }
+
+        internal static CustomMultiClassificationTask ConvertToCustomMultiClassificationTask(CustomMultiClassificationOptions option)
+        {
+            return new CustomMultiClassificationTask()
+            {
+                Parameters = new CustomMultiClassificationTaskParameters()
+                {
+                    PublishId = option.PublishId
+                }
+            };
+        }
+
         internal static IList<KeyPhrasesTask> ConvertFromKeyPhrasesOptionsToTasks(IReadOnlyCollection<ExtractKeyPhrasesOptions> extractKeyPhrasesOptions)
         {
             List<KeyPhrasesTask> list = new List<KeyPhrasesTask>();
@@ -412,6 +537,42 @@ namespace Azure.AI.TextAnalytics
             foreach (RecognizePiiEntitiesOptions option in recognizePiiEntityOptions)
             {
                 list.Add(ConvertToPiiTask(option));
+            }
+
+            return list;
+        }
+
+        internal static IList<CustomEntitiesTask> ConvertFromCustomEntityOptionsToTasks(IReadOnlyCollection<RecognizeCustomEntitiesOptions> recognizeCustomEntitiesOptions)
+        {
+            List<CustomEntitiesTask> list = new List<CustomEntitiesTask>();
+
+            foreach (RecognizeCustomEntitiesOptions option in recognizeCustomEntitiesOptions)
+            {
+                list.Add(ConvertToCustomEntitiesTask(option));
+            }
+
+            return list;
+        }
+
+        internal static IList<CustomClassificationTask> ConvertFromCustomClassificationOptionsToTasks(IReadOnlyCollection<CustomClassificationOptions> customClassificationOptions)
+        {
+            List<CustomClassificationTask> list = new List<CustomClassificationTask>();
+
+            foreach (CustomClassificationOptions option in customClassificationOptions)
+            {
+                list.Add(ConvertToCustomClassificationTask(option));
+            }
+
+            return list;
+        }
+
+        internal static IList<CustomMultiClassificationTask> ConvertFromCustomMultiClassificationOptionsToTasks(IReadOnlyCollection<CustomMultiClassificationOptions> customMultiClassificationOptions)
+        {
+            List<CustomMultiClassificationTask> list = new List<CustomMultiClassificationTask>();
+
+            foreach (CustomMultiClassificationOptions option in customMultiClassificationOptions)
+            {
+                list.Add(ConvertToCustomMultiClassificationTask(option));
             }
 
             return list;
@@ -481,6 +642,9 @@ namespace Azure.AI.TextAnalytics
             IDictionary<int, TextAnalyticsErrorInternal> entitiesRecognitionErrors = new Dictionary<int, TextAnalyticsErrorInternal>();
             IDictionary<int, TextAnalyticsErrorInternal> entitiesPiiRecognitionErrors = new Dictionary<int, TextAnalyticsErrorInternal>();
             IDictionary<int, TextAnalyticsErrorInternal> entitiesLinkingRecognitionErrors = new Dictionary<int, TextAnalyticsErrorInternal>();
+            IDictionary<int, TextAnalyticsErrorInternal> customEntitiesRecognitionErrors = new Dictionary<int, TextAnalyticsErrorInternal>();
+            IDictionary<int, TextAnalyticsErrorInternal> customClassificationErrors = new Dictionary<int, TextAnalyticsErrorInternal>();
+            IDictionary<int, TextAnalyticsErrorInternal> customMultiClassificationErrors = new Dictionary<int, TextAnalyticsErrorInternal>();
 
             if (jobState.Errors.Any())
             {
@@ -506,6 +670,18 @@ namespace Azure.AI.TextAnalytics
                     {
                         entitiesLinkingRecognitionErrors.Add(taskIndex, error);
                     }
+                    else if ("customEntityRecognitionTasks".Equals(taskName))
+                    {
+                        customEntitiesRecognitionErrors.Add(taskIndex, error);
+                    }
+                    else if ("customClassificationTasks".Equals(taskName))
+                    {
+                        customClassificationErrors.Add(taskIndex, error);
+                    }
+                    else if ("customMultiClassificationTasks".Equals(taskName))
+                    {
+                        customMultiClassificationErrors.Add(taskIndex, error);
+                    }
                     else
                     {
                         throw new InvalidOperationException($"Invalid task name in target reference - {taskName}");
@@ -517,8 +693,11 @@ namespace Azure.AI.TextAnalytics
             var recognizeEntitiesActionResults = ConvertToRecognizeEntitiesActionsResults(jobState, map, entitiesRecognitionErrors);
             var recognizePiiEntitiesActionResults = ConvertToRecognizePiiEntitiesActionsResults(jobState, map, entitiesPiiRecognitionErrors);
             var recognizeLinkedEntitiesActionsResults = ConvertToRecognizeLinkedEntitiesActionsResults(jobState, map, entitiesLinkingRecognitionErrors);
+            var recognizeCustomEntitiesActionResults = ConvertToRecognizeCustomEntitiesActionsResults(jobState, map, customEntitiesRecognitionErrors);
+            var customClassificationActionResults = ConvertToCustomClassificationActionsResults(jobState, map, customClassificationErrors);
+            var customMultiClassificationActionResults = ConvertToCustomMultiClassificationActionsResults(jobState, map, customMultiClassificationErrors);
 
-            return new AnalyzeBatchActionsResult(extractKeyPhrasesActionResult, recognizeEntitiesActionResults, recognizePiiEntitiesActionResults, recognizeLinkedEntitiesActionsResults, jobState.Statistics);
+            return new AnalyzeBatchActionsResult(extractKeyPhrasesActionResult, recognizeEntitiesActionResults, recognizePiiEntitiesActionResults, recognizeLinkedEntitiesActionsResults, recognizeCustomEntitiesActionResults, customClassificationActionResults, customMultiClassificationActionResults, jobState.Statistics);
         }
 
         private static IReadOnlyCollection<RecognizeLinkedEntitiesActionResult> ConvertToRecognizeLinkedEntitiesActionsResults(AnalyzeJobState jobState, IDictionary<string, int> idToIndexMap, IDictionary<int, TextAnalyticsErrorInternal> tasksErrors)
@@ -604,6 +783,78 @@ namespace Azure.AI.TextAnalytics
                 else
                 {
                     collection.Add(new RecognizeEntitiesActionResult(ConvertToRecognizeEntitiesResultCollection(task.ResultsInternal, idToIndexMap), task.LastUpdateDateTime, taskError));
+                }
+                index++;
+            }
+
+            return collection;
+        }
+
+        internal static IReadOnlyCollection<RecognizeCustomEntitiesActionResult> ConvertToRecognizeCustomEntitiesActionsResults(AnalyzeJobState jobState, IDictionary<string, int> idToIndexMap, IDictionary<int, TextAnalyticsErrorInternal> tasksErrors)
+        {
+            var collection = new List<RecognizeCustomEntitiesActionResult>();
+            int index = 0;
+            foreach (CustomEntityRecognitionTasksItem task in jobState.Tasks.CustomEntityRecognitionTasks)
+            {
+                tasksErrors.TryGetValue(index, out TextAnalyticsErrorInternal taskError);
+
+                tasksErrors.TryGetValue(index, out taskError);
+
+                if (taskError != null)
+                {
+                    collection.Add(new RecognizeCustomEntitiesActionResult(null, task.LastUpdateDateTime, taskError));
+                }
+                else
+                {
+                    collection.Add(new RecognizeCustomEntitiesActionResult(ConvertToRecognizeCustomEntitiesResultCollection(task.ResultsInternal, idToIndexMap), task.LastUpdateDateTime, taskError));
+                }
+                index++;
+            }
+
+            return collection;
+        }
+
+        internal static IReadOnlyCollection<CustomClassificationActionResult> ConvertToCustomClassificationActionsResults(AnalyzeJobState jobState, IDictionary<string, int> idToIndexMap, IDictionary<int, TextAnalyticsErrorInternal> tasksErrors)
+        {
+            var collection = new List<CustomClassificationActionResult>();
+            int index = 0;
+            foreach (CustomClassificationTasksItem task in jobState.Tasks.CustomClassificationTasks)
+            {
+                tasksErrors.TryGetValue(index, out TextAnalyticsErrorInternal taskError);
+
+                tasksErrors.TryGetValue(index, out taskError);
+
+                if (taskError != null)
+                {
+                    collection.Add(new CustomClassificationActionResult(null, task.LastUpdateDateTime, taskError));
+                }
+                else
+                {
+                    collection.Add(new CustomClassificationActionResult(ConvertToCustomClassificationResultCollection(task.ResultsInternal, idToIndexMap), task.LastUpdateDateTime, taskError));
+                }
+                index++;
+            }
+
+            return collection;
+        }
+
+        internal static IReadOnlyCollection<CustomMultiClassificationActionResult> ConvertToCustomMultiClassificationActionsResults(AnalyzeJobState jobState, IDictionary<string, int> idToIndexMap, IDictionary<int, TextAnalyticsErrorInternal> tasksErrors)
+        {
+            var collection = new List<CustomMultiClassificationActionResult>();
+            int index = 0;
+            foreach (CustomMultiClassificationTasksItem task in jobState.Tasks.CustomMultiClassificationTasks)
+            {
+                tasksErrors.TryGetValue(index, out TextAnalyticsErrorInternal taskError);
+
+                tasksErrors.TryGetValue(index, out taskError);
+
+                if (taskError != null)
+                {
+                    collection.Add(new CustomMultiClassificationActionResult(null, task.LastUpdateDateTime, taskError));
+                }
+                else
+                {
+                    collection.Add(new CustomMultiClassificationActionResult(ConvertToCustomMultiClassificationResultCollection(task.ResultsInternal, idToIndexMap), task.LastUpdateDateTime, taskError));
                 }
                 index++;
             }

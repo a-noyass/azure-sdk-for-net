@@ -16,12 +16,18 @@ namespace Azure.AI.TextAnalytics
             IReadOnlyCollection<RecognizeEntitiesActionResult> recognizeEntitiesActionResults,
             IReadOnlyCollection<RecognizePiiEntitiesActionResult> recognizePiiEntitiesActionResults,
             IReadOnlyCollection<RecognizeLinkedEntitiesActionResult> recognizeLinkedEntitiesActionsResults,
+            IReadOnlyCollection<RecognizeCustomEntitiesActionResult> recognizeCustomEntitiesActionResults,
+            IReadOnlyCollection<CustomClassificationActionResult> customClassificationActionResult,
+            IReadOnlyCollection<CustomMultiClassificationActionResult> customMultiClassificationActionResult,
             TextDocumentBatchStatistics statistics)
         {
             ExtractKeyPhrasesActionsResults = extractKeyPhrasesActionResult;
             RecognizeEntitiesActionsResults = recognizeEntitiesActionResults;
             RecognizePiiEntitiesActionsResults = recognizePiiEntitiesActionResults;
             RecognizeLinkedEntitiesActionsResults = recognizeLinkedEntitiesActionsResults;
+            RecognizeCustomEntitiesActionsResults = recognizeCustomEntitiesActionResults;
+            CustomClassificationActionsResults = customClassificationActionResult;
+            CustomMultiClassificationActionsResults = customMultiClassificationActionResult;
             Statistics = statistics;
         }
 
@@ -32,6 +38,9 @@ namespace Azure.AI.TextAnalytics
             RecognizeEntitiesActionsResults = actionResults.RecognizeEntitiesActionsResults;
             RecognizePiiEntitiesActionsResults = actionResults.RecognizePiiEntitiesActionsResults;
             RecognizeLinkedEntitiesActionsResults = actionResults.RecognizeLinkedEntitiesActionsResults;
+            RecognizeCustomEntitiesActionsResults = actionResults.RecognizeCustomEntitiesActionsResults;
+            CustomClassificationActionsResults = actionResults.CustomClassificationActionsResults;
+            CustomMultiClassificationActionsResults = actionResults.CustomMultiClassificationActionsResults;
             Statistics = actionResults.Statistics;
         }
 
@@ -54,6 +63,21 @@ namespace Azure.AI.TextAnalytics
         /// Determines the collection of RecognizeLinkedEntitiesActionsResult.
         /// </summary>
         public IReadOnlyCollection<RecognizeLinkedEntitiesActionResult> RecognizeLinkedEntitiesActionsResults { get; }
+
+        /// <summary>
+        /// Determines the collection of RecognizeCustomEntitiesActionResult.
+        /// </summary>
+        public IReadOnlyCollection<RecognizeCustomEntitiesActionResult> RecognizeCustomEntitiesActionsResults { get; }
+
+        /// <summary>
+        /// Determines the collection of RecognizeCustomEntitiesActionResult.
+        /// </summary>
+        public IReadOnlyCollection<CustomClassificationActionResult> CustomClassificationActionsResults { get; }
+
+        /// <summary>
+        /// Determines the collection of RecognizeCustomEntitiesActionResult.
+        /// </summary>
+        public IReadOnlyCollection<CustomMultiClassificationActionResult> CustomMultiClassificationActionsResults { get; }
 
         /// <summary>
         /// Gets statistics about the operation executed and how it was processed

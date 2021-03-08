@@ -21,6 +21,9 @@ namespace Azure.AI.TextAnalytics
             EntityRecognitionPiiTasks = new ChangeTrackingList<PiiTask>();
             KeyPhraseExtractionTasks = new ChangeTrackingList<KeyPhrasesTask>();
             EntityLinkingTasks = new ChangeTrackingList<EntityLinkingTask>();
+            CustomEntityRecognitionTasks = new ChangeTrackingList<CustomEntitiesTask>();
+            CustomClassificationTasks = new ChangeTrackingList<CustomClassificationTask>();
+            CustomMultiClassificationTasks = new ChangeTrackingList<CustomMultiClassificationTask>();
         }
     }
 }
