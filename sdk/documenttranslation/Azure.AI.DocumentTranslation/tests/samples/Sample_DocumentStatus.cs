@@ -22,7 +22,7 @@ namespace Azure.AI.DocumentTranslation.Tests.Samples
 
             var client = new DocumentTranslationClient(new Uri(endpoint), new AzureKeyCredential(apiKey));
 
-            DocumentTranslationOperation operation = client.StartTranslationFromAzureBlobs(sourceUrl, targetUrl, "it");
+            DocumentTranslationOperation operation = client.StartTranslation(sourceUrl, targetUrl, "it");
 
             var documentscompleted = new HashSet<string>();
 
@@ -30,15 +30,15 @@ namespace Azure.AI.DocumentTranslation.Tests.Samples
             {
                 operation.UpdateStatus();
 
-                Pageable<DocumentStatusDetail> documentsStatus = operation.GetDocumentsStatus();
+                Pageable<DocumentStatusDetail> documentsStatus = operation.GetAllDocumentsStatus();
                 foreach (DocumentStatusDetail docStatus in documentsStatus)
                 {
-                    if (documentscompleted.Contains(docStatus.Id))
+                    if (documentscompleted.Contains(docStatus.DocumentId))
                         continue;
                     if (docStatus.Status == TranslationStatus.Succeeded || docStatus.Status == TranslationStatus.Failed)
                     {
-                        documentscompleted.Add(docStatus.Id);
-                        Console.WriteLine($"Document {docStatus.Url} completed with status ${docStatus.Status}");
+                        documentscompleted.Add(docStatus.DocumentId);
+                        Console.WriteLine($"Document {docStatus.LocationUri} completed with status ${docStatus.Status}");
                     }
                 }
             }

@@ -22,7 +22,7 @@ namespace Azure.AI.DocumentTranslation.Tests.Samples
 
             var client = new DocumentTranslationClient(new Uri(endpoint), new AzureKeyCredential(apiKey));
 
-            DocumentTranslationOperation operation = client.StartTranslationFromAzureBlobs(sourceUrl, targetUrl, "it");
+            DocumentTranslationOperation operation = client.StartTranslation(sourceUrl, targetUrl, "it");
 
             TimeSpan pollingInterval = new TimeSpan(1000);
 
@@ -43,16 +43,16 @@ namespace Azure.AI.DocumentTranslation.Tests.Samples
 
             foreach (DocumentStatusDetail document in operation.GetValues())
             {
-                Console.WriteLine($"Document with Id: {document.Id}");
+                Console.WriteLine($"Document with Id: {document.DocumentId}");
                 Console.WriteLine($"  Status:{document.Status}");
                 if (document.Status == TranslationStatus.Succeeded)
                 {
-                    Console.WriteLine($"  Location: {document.Url}");
+                    Console.WriteLine($"  Location: {document.LocationUri}");
                     Console.WriteLine($"  Translated to language: {document.TranslateTo}.");
                 }
                 else
                 {
-                    Console.WriteLine($"  Error Code: {document.Error.Code}");
+                    Console.WriteLine($"  Error Code: {document.Error.ErrorCode}");
                     Console.WriteLine($"  Message: {document.Error.Message}");
                 }
             }

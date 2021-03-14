@@ -13,7 +13,7 @@ using Azure.Core.Pipeline;
 namespace Azure.AI.DocumentTranslation
 {
     /// <summary>
-    /// The client to use for interacting with the Azure Translator Service.
+    /// The client to use for interacting with the Azure Document Translation Service.
     /// </summary>
     public class DocumentTranslationClient
     {
@@ -28,8 +28,7 @@ namespace Azure.AI.DocumentTranslation
         /// Protected constructor to allow mocking.
         /// </summary>
         protected DocumentTranslationClient()
-        {
-        }
+        { }
 
         /// <summary>
         /// Initializes a new instance of <see cref="DocumentTranslationClient"/>
@@ -110,7 +109,7 @@ namespace Azure.AI.DocumentTranslation
         /// including source and target storage for documents to be translated. </param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> controlling the request lifetime.</param>
         /// <exception cref="RequestFailedException">Service returned a non-success status code. </exception>
-        public virtual DocumentTranslationOperation StartTranslation(List<TranslationConfiguration> configurations, CancellationToken cancellationToken = default)
+        public virtual DocumentTranslationOperation StartTranslation(IEnumerable<TranslationConfiguration> configurations, CancellationToken cancellationToken = default)
         {
             var request = new BatchSubmissionRequest(configurations);
             using DiagnosticScope scope = _clientDiagnostics.CreateScope($"{nameof(DocumentTranslationClient)}.{nameof(StartTranslation)}");
@@ -137,7 +136,7 @@ namespace Azure.AI.DocumentTranslation
         /// including source and target storage for documents to be translated. </param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> controlling the request lifetime.</param>
         /// <exception cref="RequestFailedException">Service returned a non-success status code. </exception>
-        public virtual async Task<DocumentTranslationOperation> StartTranslationAsync(List<TranslationConfiguration> configurations, CancellationToken cancellationToken = default)
+        public virtual async Task<DocumentTranslationOperation> StartTranslationAsync(IEnumerable<TranslationConfiguration> configurations, CancellationToken cancellationToken = default)
         {
             var request = new BatchSubmissionRequest(configurations);
             using DiagnosticScope scope = _clientDiagnostics.CreateScope($"{nameof(DocumentTranslationClient)}.{nameof(StartTranslationAsync)}");
@@ -162,35 +161,38 @@ namespace Azure.AI.DocumentTranslation
         /// </summary>
         /// <param name="sourceBlobContainerSas">The SAS URL for the source container containing documents to be translated. </param>
         /// <param name="targetBlobContainerSas">The SAS URL for the target container to which the translated documents will be written. </param>
-        /// <param name="targetLanguage">Language code to translate documents to. For supported documents see
+        /// <param name="targetLanguageCode">Language code to translate documents to. For supported documents see
         /// TODO: Add link to documentation </param>
         /// <param name="glossary">Custom translation glossary to be used in the translation operation. For supported file types see
         /// TODO: Add link to documentation</param>
         /// <param name="options">Set translation options including source language and custom translation category</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> controlling the request lifetime.</param>
-        public virtual DocumentTranslationOperation StartTranslationFromAzureBlobs(Uri sourceBlobContainerSas, Uri targetBlobContainerSas, string targetLanguage, TranslationGlossary glossary = default, TranslationOperationOptions options = default, CancellationToken cancellationToken = default)
+        public virtual DocumentTranslationOperation StartTranslation(Uri sourceBlobContainerSas, Uri targetBlobContainerSas, string targetLanguageCode, TranslationGlossary glossary = default, TranslationOperationOptions options = default, CancellationToken cancellationToken = default)
         {
             var source = new TranslationSource(sourceBlobContainerSas)
             {
-                Language = options.SourceLanguage,
-                Filter = options.Filter
+                LanguageCode = options?.SourceLanguage,
+                Filter = options?.Filter
             };
+
+            var glossaries = glossary == null ? new List<TranslationGlossary>() : new List<TranslationGlossary> { glossary };
 
             var targets = new List<TranslationTarget>
             {
-                new TranslationTarget(targetBlobContainerSas, targetLanguage, new List<TranslationGlossary>{ glossary })
+                new TranslationTarget(targetBlobContainerSas, targetLanguageCode, glossaries)
                 {
-                    Category = options.Category
+                    Category = options?.Category
                 }
             };
+
             var request = new BatchSubmissionRequest(new List<TranslationConfiguration>
                 {
                     new TranslationConfiguration(source, targets)
                     {
-                        StorageType = options.StorageType
+                        StorageType = options?.StorageType
                     }
-                });
-
+                }
+            );
             using DiagnosticScope scope = _clientDiagnostics.CreateScope($"{nameof(DocumentTranslationClient)}.{nameof(StartTranslation)}");
             scope.Start();
 
@@ -213,34 +215,38 @@ namespace Azure.AI.DocumentTranslation
         /// </summary>
         /// <param name="sourceBlobContainerSas">The SAS URL for the source container containing documents to be translated. </param>
         /// <param name="targetBlobContainerSas">The SAS URL for the target container to which the translated documents will be written. </param>
-        /// <param name="targetLanguage">Language code to translate documents to. For supported documents see
+        /// <param name="targetLanguageCode">Language code to translate documents to. For supported documents see
         /// TODO: Add link to documentation </param>
         /// <param name="glossary">Custom translation glossary to be used in the translation operation. For supported file types see
         /// TODO: Add link to documentation</param>
         /// <param name="options">Set translation options including source language and custom translation category</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> controlling the request lifetime.</param>
-        public virtual async Task<DocumentTranslationOperation> StartTranslationFromAzureBlobsAsync(Uri sourceBlobContainerSas, Uri targetBlobContainerSas, string targetLanguage, TranslationGlossary glossary = default, TranslationOperationOptions options = default, CancellationToken cancellationToken = default)
+        public virtual async Task<DocumentTranslationOperation> StartTranslationAsync(Uri sourceBlobContainerSas, Uri targetBlobContainerSas, string targetLanguageCode, TranslationGlossary glossary = default, TranslationOperationOptions options = default, CancellationToken cancellationToken = default)
         {
             var source = new TranslationSource(sourceBlobContainerSas)
             {
-                Language = options.SourceLanguage,
-                Filter = options.Filter
+                LanguageCode = options?.SourceLanguage,
+                Filter = options?.Filter
             };
+
+            var glossaries = glossary == null ? new List<TranslationGlossary>() : new List<TranslationGlossary> { glossary };
 
             var targets = new List<TranslationTarget>
             {
-                new TranslationTarget(targetBlobContainerSas, targetLanguage, new List<TranslationGlossary>{ glossary })
+                new TranslationTarget(targetBlobContainerSas, targetLanguageCode, glossaries)
                 {
-                    Category = options.Category
+                    Category = options?.Category
                 }
             };
+
             var request = new BatchSubmissionRequest(new List<TranslationConfiguration>
                 {
                     new TranslationConfiguration(source, targets)
                     {
-                        StorageType = options.StorageType
+                        StorageType = options?.StorageType
                     }
-                });
+                }
+            );
 
             using DiagnosticScope scope = _clientDiagnostics.CreateScope($"{nameof(DocumentTranslationClient)}.{nameof(StartTranslationAsync)}");
             scope.Start();
@@ -261,11 +267,11 @@ namespace Azure.AI.DocumentTranslation
         /// Get the status details for all submitted translation operations.
         /// </summary>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> controlling the request lifetime.</param>
-        public virtual Pageable<TranslationStatusDetail> GetSubmittedTranslations(CancellationToken cancellationToken = default)
+        public virtual Pageable<TranslationStatusDetail> GetTranslations(CancellationToken cancellationToken = default)
         {
             Page<TranslationStatusDetail> FirstPageFunc(int? pageSizeHint)
             {
-                using DiagnosticScope scope = _clientDiagnostics.CreateScope($"{nameof(DocumentTranslationClient)}.{nameof(GetSubmittedTranslations)}");
+                using DiagnosticScope scope = _clientDiagnostics.CreateScope($"{nameof(DocumentTranslationClient)}.{nameof(GetTranslations)}");
                 scope.Start();
 
                 try
@@ -282,7 +288,7 @@ namespace Azure.AI.DocumentTranslation
 
             Page<TranslationStatusDetail> NextPageFunc(string nextLink, int? pageSizeHint)
             {
-                using DiagnosticScope scope = _clientDiagnostics.CreateScope($"{nameof(DocumentTranslationClient)}.{nameof(GetSubmittedTranslations)}");
+                using DiagnosticScope scope = _clientDiagnostics.CreateScope($"{nameof(DocumentTranslationClient)}.{nameof(GetTranslations)}");
                 scope.Start();
 
                 try
@@ -304,11 +310,11 @@ namespace Azure.AI.DocumentTranslation
         /// Get the status details for all submitted translation operations.
         /// </summary>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> controlling the request lifetime.</param>
-        public virtual AsyncPageable<TranslationStatusDetail> GetSubmittedTranslationsAsync(CancellationToken cancellationToken = default)
+        public virtual AsyncPageable<TranslationStatusDetail> GetTranslationsAsync(CancellationToken cancellationToken = default)
         {
             async Task<Page<TranslationStatusDetail>> FirstPageFunc(int? pageSizeHint)
             {
-                using DiagnosticScope scope = _clientDiagnostics.CreateScope($"{nameof(DocumentTranslationClient)}.{nameof(GetSubmittedTranslationsAsync)}");
+                using DiagnosticScope scope = _clientDiagnostics.CreateScope($"{nameof(DocumentTranslationClient)}.{nameof(GetTranslationsAsync)}");
                 scope.Start();
 
                 try
@@ -325,7 +331,7 @@ namespace Azure.AI.DocumentTranslation
 
             async Task<Page<TranslationStatusDetail>> NextPageFunc(string nextLink, int? pageSizeHint)
             {
-                using DiagnosticScope scope = _clientDiagnostics.CreateScope($"{nameof(DocumentTranslationClient)}.{nameof(GetSubmittedTranslationsAsync)}");
+                using DiagnosticScope scope = _clientDiagnostics.CreateScope($"{nameof(DocumentTranslationClient)}.{nameof(GetTranslationsAsync)}");
                 scope.Start();
 
                 try
@@ -345,7 +351,11 @@ namespace Azure.AI.DocumentTranslation
 
         #region supported formats functions
 
-        internal virtual Response<IReadOnlyList<FileFormat>> GetSupportedGlossaryFormats(CancellationToken cancellationToken = default)
+        /// <summary>
+        /// Get a list of supported Glossary File Formats.
+        /// </summary>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> controlling the request lifetime.</param>
+        public virtual Response<IReadOnlyList<FileFormat>> GetSupportedGlossaryFormats(CancellationToken cancellationToken = default)
         {
             using DiagnosticScope scope = _clientDiagnostics.CreateScope($"{nameof(DocumentTranslationClient)}.{nameof(GetSupportedGlossaryFormats)}");
             scope.Start();
@@ -362,7 +372,11 @@ namespace Azure.AI.DocumentTranslation
             }
         }
 
-        internal virtual async Task<Response<IReadOnlyList<FileFormat>>> GetSupportedGlossaryFormatsAsync(CancellationToken cancellationToken = default)
+        /// <summary>
+        /// Get a list of supported Glossary File Formats.
+        /// </summary>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> controlling the request lifetime.</param>
+        public virtual async Task<Response<IReadOnlyList<FileFormat>>> GetSupportedGlossaryFormatsAsync(CancellationToken cancellationToken = default)
         {
             using DiagnosticScope scope = _clientDiagnostics.CreateScope($"{nameof(DocumentTranslationClient)}.{nameof(GetSupportedGlossaryFormatsAsync)}");
             scope.Start();
@@ -379,7 +393,11 @@ namespace Azure.AI.DocumentTranslation
             }
         }
 
-        internal virtual Response<IReadOnlyList<FileFormat>> GetSupportedDocumentFormats(CancellationToken cancellationToken = default)
+        /// <summary>
+        /// Get a list of supported Document Formats.
+        /// </summary>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> controlling the request lifetime.</param>
+        public virtual Response<IReadOnlyList<FileFormat>> GetSupportedDocumentFormats(CancellationToken cancellationToken = default)
         {
             using DiagnosticScope scope = _clientDiagnostics.CreateScope($"{nameof(DocumentTranslationClient)}.{nameof(GetSupportedDocumentFormats)}");
             scope.Start();
@@ -396,7 +414,11 @@ namespace Azure.AI.DocumentTranslation
             }
         }
 
-        internal virtual async Task<Response<IReadOnlyList<FileFormat>>> GetSupportedDocumentFormatsAsync(CancellationToken cancellationToken = default)
+        /// <summary>
+        /// Get a list of supported Document Formats.
+        /// </summary>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> controlling the request lifetime.</param>
+        public virtual async Task<Response<IReadOnlyList<FileFormat>>> GetSupportedDocumentFormatsAsync(CancellationToken cancellationToken = default)
         {
             using DiagnosticScope scope = _clientDiagnostics.CreateScope($"{nameof(DocumentTranslationClient)}.{nameof(GetSupportedDocumentFormatsAsync)}");
             scope.Start();

@@ -19,7 +19,7 @@ namespace Azure.AI.DocumentTranslation.Tests.Samples
 
             var client = new DocumentTranslationClient(new Uri(endpoint), new AzureKeyCredential(apiKey));
 
-            AsyncPageable<TranslationStatusDetail> operationsStatus = client.GetSubmittedTranslationsAsync();
+            AsyncPageable<TranslationStatusDetail> operationsStatus = client.GetTranslationsAsync();
 
             int operationsCount = 0;
             int totalDocs = 0;
@@ -50,13 +50,13 @@ namespace Azure.AI.DocumentTranslation.Tests.Samples
 
             // After user studies we can do this if needed
             // DocumentTranslationOperation operation = largestOperation.GetOperation();
-            DocumentTranslationOperation operation = new DocumentTranslationOperation(largestOperation.Id, client);
+            DocumentTranslationOperation operation = new DocumentTranslationOperation(largestOperation.TranslationId, client);
 
-            AsyncPageable<DocumentStatusDetail> docs = operation.GetDocumentsStatusAsync();
+            AsyncPageable<DocumentStatusDetail> docs = operation.GetAllDocumentsStatusAsync();
 
             await foreach (DocumentStatusDetail docStatus in docs)
             {
-                Console.WriteLine($"Document {docStatus.Url} has status {docStatus.Status}");
+                Console.WriteLine($"Document {docStatus.LocationUri} has status {docStatus.Status}");
             }
         }
     }

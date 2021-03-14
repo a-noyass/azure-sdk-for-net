@@ -19,7 +19,7 @@ namespace Azure.AI.DocumentTranslation.Tests.Samples
 
             var client = new DocumentTranslationClient(new Uri(endpoint), new AzureKeyCredential(apiKey));
 
-            Pageable<TranslationStatusDetail> operationsStatus = client.GetSubmittedTranslations();
+            Pageable<TranslationStatusDetail> operationsStatus = client.GetTranslations();
 
             int operationsCount = 0;
             int totalDocs = 0;
@@ -46,17 +46,17 @@ namespace Azure.AI.DocumentTranslation.Tests.Samples
             Console.WriteLine($"DocumentsSucceeded: {docsSucceeded}");
             Console.WriteLine($"Cancelled Documents: {docsCancelled}");
 
-            Console.WriteLine($"Largest operation is {largestOperation.Id} and has the documents:");
+            Console.WriteLine($"Largest operation is {largestOperation.TranslationId} and has the documents:");
 
             // After user studies we can do this if needed
             // DocumentTranslationOperation operation = largestOperation.GetOperation(client);
-            DocumentTranslationOperation operation = new DocumentTranslationOperation(largestOperation.Id, client);
+            DocumentTranslationOperation operation = new DocumentTranslationOperation(largestOperation.TranslationId, client);
 
-            Pageable<DocumentStatusDetail> docs = operation.GetDocumentsStatus();
+            Pageable<DocumentStatusDetail> docs = operation.GetAllDocumentsStatus();
 
             foreach (DocumentStatusDetail docStatus in docs)
             {
-                Console.WriteLine($"Document {docStatus.Url} has status {docStatus.Status}");
+                Console.WriteLine($"Document {docStatus.LocationUri} has status {docStatus.Status}");
             }
         }
     }
